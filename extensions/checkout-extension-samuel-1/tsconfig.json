@@ -3,7 +3,21 @@
   // About the `react-jsx` tsconfig option, so IDE doesn't complain about missing react import
   // Changing options here won't affect the build of your extension
   "compilerOptions": {
-    "jsx": "react-jsx"
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "removeComments": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "baseUrl": "."
   },
   "include": ["./src"]
 }

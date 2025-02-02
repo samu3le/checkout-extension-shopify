@@ -1,16 +1,18 @@
 import {
   reactExtension,
   Banner,
+  Button,
   BlockStack,
   Checkbox,
+  TextField,
   Text,
   useApi,
   useApplyAttributeChange,
   useInstructions,
   useTranslate,
 } from "@shopify/ui-extensions-react/checkout";
+import { useState } from "react";
 
-// 1. Choose an extension target
 export default reactExtension("purchase.checkout.block.render", () => (
   <Extension />
 ));
@@ -21,11 +23,9 @@ function Extension() {
   const instructions = useInstructions();
   const applyAttributeChange = useApplyAttributeChange();
 
+  const [isVisible, setIsVisible] = useState(false);
 
-  // 2. Check instructions for feature availability, see https://shopify.dev/docs/api/checkout-ui-extensions/apis/cart-instructions for details
   if (!instructions.attributes.canUpdateAttributes) {
-    // For checkouts such as draft order invoices, cart attributes may not be allowed
-    // Consider rendering a fallback UI or nothing at all, if the feature is unavailable
     return (
       <Banner title="checkout-extension-samuel-1" status="warning">
         {translate("attributeChangesAreNotSupported")}
@@ -33,27 +33,33 @@ function Extension() {
     );
   }
 
-  // 3. Render a UI
   return (
     <BlockStack border={"dotted"} padding={"tight"}>
       <Banner title="checkout-extension-samuel-1">
-        {translate("welcome", {
-          target: <Text emphasis="italic">{extension.target}</Text>,
-        })}
+        <Button
+          onPress={() => {
+            setIsVisible(!isVisible);
+            if (isVisible==false) onChangeGiftMessage("");
+          }}
+        >
+          {isVisible ? "Hide note" : "Add note"}
+        </Button>
       </Banner>
-      <Checkbox onChange={onCheckboxChange}>
-        {translate("iWouldLikeAFreeGiftWithMyOrder")}
-      </Checkbox>
+      {isVisible && (
+        <TextField 
+          label="Gift text" 
+          maxLength={250} 
+          onChange={onChangeGiftMessage}
+        />
+      )}
     </BlockStack>
   );
-
-  async function onCheckboxChange(isChecked) {
-    // 4. Call the API to modify checkout
+  async function onChangeGiftMessage(value: string) {
     const result = await applyAttributeChange({
-      key: "requestedFreeGift",
+      key: "requestedGiftMessage",
       type: "updateAttribute",
-      value: isChecked ? "yes" : "no",
+      value: value,
     });
-    console.log("applyAttributeChange result", result);
+    console.log("applyAttributeChange result", {result, value});
   }
 }
